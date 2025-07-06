@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard - Alias Trust Company</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <h2>Alias Trust Company</h2>
+                </a>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="dashboard.html#portfolio" class="nav-link">Portfolio</a>
+                </li>
+                <li class="nav-item">
+                    <a href="dashboard.html#trading" class="nav-link">Trading</a>
+                </li>
+                <li class="nav-item">
+                    <a href="dashboard.html#storage" class="nav-link">Storage</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Dashboard Header -->
+    <header class="dashboard-header">
+        <div class="container">
+            <div class="welcome-section">
+                <h1>Welcome back, <span id="userName">Client</span></h1>
+                <p>Your gold investment portfolio overview</p>
+            </div>
+            <div class="account-info">
+                <div class="account-number">
+                    <span>Account: #<span id="accountNumber">ATC-2024-001</span></span>
+                </div>
+                <div class="last-login">
+                    <span>Last login: <span id="lastLogin">Today at 9:30 AM</span></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Portfolio Summary -->
+    <section class="portfolio-summary">
+        <div class="container">
+            <div class="summary-grid">
+                <div class="summary-card">
+                    <div class="summary-icon">💰</div>
+                    <div class="summary-content">
+                        <h3>Total Portfolio Value</h3>
+                        <div class="summary-value" id="totalValue">$1,247,850.00</div>
+                        <div class="summary-change positive">+$12,450.00 (+1.01%)</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🥇</div>
+                    <div class="summary-content">
+                        <h3>Gold Holdings</h3>
+                        <div class="summary-value" id="goldHoldings">507.5 oz</div>
+                        <div class="summary-change positive">+2.5 oz (+0.49%)</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">📈</div>
+                    <div class="summary-content">
+                        <h3>Total Return</h3>
+                        <div class="summary-value" id="totalReturn">+$89,250.00</div>
+                        <div class="summary-change positive">+7.7% YTD</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon">🏦</div>
+                    <div class="summary-content">
+                        <h3>Storage Fees</h3>
+                        <div class="summary-value" id="storageFees">$2,450.00</div>
+                        <div class="summary-change neutral">Annual</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Gold Prices -->
+    <section class="live-prices">
+        <div class="container">
+            <h2>Live Market Data</h2>
+            <div class="price-ticker">
+                <div class="ticker-item">
+                    <span class="ticker-label">Gold Spot:</span>
+                    <span class="ticker-price" id="goldSpotPrice">$2,450.50</span>
+                    <span class="ticker-change positive" id="goldSpotChange">+$12.30</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-label">Gold Futures:</span>
+                    <span class="ticker-price" id="goldFuturesPrice">$2,452.75</span>
+                    <span class="ticker-change positive" id="goldFuturesChange">+$8.45</span>
+                </div>
+                <div class="ticker-item">
+                    <span class="ticker-label">Silver Spot:</span>
+                    <span class="ticker-price" id="silverSpotPrice">$28.45</span>
+                    <span class="ticker-change negative" id="silverSpotChange">-$0.15</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Details -->
+    <section id="portfolio" class="portfolio-details">
+        <div class="container">
+            <div class="section-header">
+                <h2>Your Gold Portfolio</h2>
+                <div class="section-actions">
+                    <button class="btn btn-secondary" onclick="exportPortfolio()">Export Report</button>
+                    <button class="btn btn-primary" onclick="openTradeModal()">New Trade</button>
+                </div>
+            </div>
+            
+            <div class="portfolio-grid">
+                <div class="portfolio-chart">
+                    <h3>Portfolio Performance</h3>
+                    <div class="chart-container">
+                        <canvas id="portfolioChart"></canvas>
+                    </div>
+                    <div class="chart-btn-group" style="text-align:center; margin-top: 1.5rem;">
+                        <button id="addDataBtn" class="btn btn-secondary">Add Data Point</button>
+                        <button id="realtimeBtn" class="btn btn-primary">Start Real-Time Update</button>
+                        <button id="resetBtn" class="btn btn-secondary">Reset Data</button>
+                    </div>
+                </div>
+                
+                <div class="holdings-list">
+                    <h3>Gold Holdings</h3>
+                    <div class="holdings-table">
+                        <div class="table-header">
+                            <span>Type</span>
+                            <span>Quantity</span>
+                            <span>Value</span>
+                            <span>Return</span>
+                        </div>
+                        <div class="table-row">
+                            <span>1 oz Gold Bars</span>
+                            <span>250 oz</span>
+                            <span>$612,625.00</span>
+                            <span class="positive">+$45,250.00</span>
+                        </div>
+                        <div class="table-row">
+                            <span>10 oz Gold Bars</span>
+                            <span>25 bars</span>
+                            <span>$612,625.00</span>
+                            <span class="positive">+$44,000.00</span>
+                        </div>
+                        <div class="table-row">
+                            <span>Gold Coins</span>
+                            <span>7.5 oz</span>
+                            <span>$22,600.00</span>
+                            <span class="neutral">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trading Section -->
+    <section id="trading" class="trading-section">
+        <div class="container">
+            <h2>Trading Platform</h2>
+            <div class="trading-grid">
+                <div class="trading-form">
+                    <h3>Place Order</h3>
+                    <form id="tradeForm">
+                        <div class="form-group">
+                            <label for="orderType">Order Type</label>
+                            <select id="orderType" required>
+                                <option value="buy">Buy Gold</option>
+                                <option value="sell">Sell Gold</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderQuantity">Quantity (oz)</label>
+                            <input type="number" id="orderQuantity" min="0.1" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderPrice">Price per oz</label>
+                            <input type="number" id="orderPrice" step="0.01" required>
+                        </div>
+                        <div class="order-summary">
+                            <div class="summary-row">
+                                <span>Total Value:</span>
+                                <span id="orderTotal">$0.00</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Commission:</span>
+                                <span id="orderCommission">$0.00</span>
+                            </div>
+                            <div class="summary-row total">
+                                <span>Total Cost:</span>
+                                <span id="orderTotalCost">$0.00</span>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Place Order</button>
+                    </form>
+                </div>
+                
+                <div class="recent-trades">
+                    <h3>Recent Trades</h3>
+                    <div class="trades-list">
+                        <div class="trade-item">
+                            <div class="trade-info">
+                                <span class="trade-type buy">BUY</span>
+                                <span class="trade-quantity">5.0 oz</span>
+                                <span class="trade-price">$2,445.00</span>
+                            </div>
+                            <div class="trade-date">Today 10:30 AM</div>
+                        </div>
+                        <div class="trade-item">
+                            <div class="trade-info">
+                                <span class="trade-type sell">SELL</span>
+                                <span class="trade-quantity">2.5 oz</span>
+                                <span class="trade-price">$2,448.50</span>
+                            </div>
+                            <div class="trade-date">Yesterday 3:15 PM</div>
+                        </div>
+                        <div class="trade-item">
+                            <div class="trade-info">
+                                <span class="trade-type buy">BUY</span>
+                                <span class="trade-quantity">10.0 oz</span>
+                                <span class="trade-price">$2,440.00</span>
+                            </div>
+                            <div class="trade-date">2 days ago</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Storage Information -->
+    <section id="storage" class="storage-section">
+        <div class="container">
+            <h2>Storage & Security</h2>
+            <div class="storage-grid">
+                <div class="storage-info">
+                    <h3>Vault Location</h3>
+                    <div class="vault-details">
+                        <p><strong>Dubai Multi Commodities Centre (DMCC)</strong></p>
+                        <p>Jumeirah Lakes Towers, Dubai, UAE</p>
+                        <p>Vault ID: DMCC-VAULT-001</p>
+                    </div>
+                    <div class="security-features">
+                        <h4>Security Features:</h4>
+                        <ul>
+                            <li>24/7 armed security</li>
+                            <li>Biometric access control</li>
+                            <li>Insurance coverage up to $50M</li>
+                            <li>Regular audits and inspections</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="storage-status">
+                    <h3>Storage Status</h3>
+                    <div class="status-cards">
+                        <div class="status-card">
+                            <div class="status-icon">✅</div>
+                            <div class="status-content">
+                                <h4>Allocated Storage</h4>
+                                <p>507.5 oz allocated</p>
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-icon">🔄</div>
+                            <div class="status-content">
+                                <h4>Last Audit</h4>
+                                <p>December 15, 2024</p>
+                            </div>
+                        </div>
+                        <div class="status-card">
+                            <div class="status-icon">📋</div>
+                            <div class="status-content">
+                                <h4>Next Inspection</h4>
+                                <p>January 15, 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Trade Modal -->
+    <div id="tradeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Place New Trade</h3>
+                <span class="close" onclick="closeTradeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="modalTradeForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="modalOrderType">Order Type</label>
+                            <select id="modalOrderType" required>
+                                <option value="buy">Buy Gold</option>
+                                <option value="sell">Sell Gold</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="modalOrderQuantity">Quantity (oz)</label>
+                            <input type="number" id="modalOrderQuantity" min="0.1" step="0.1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalOrderPrice">Price per oz</label>
+                        <input type="number" id="modalOrderPrice" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="modalOrderNotes">Notes (optional)</label>
+                        <textarea id="modalOrderNotes" rows="3"></textarea>
+                    </div>
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-secondary" onclick="closeTradeModal()">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Confirm Order</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Modal -->
+    <div id="logoutModal" class="logout-modal">
+        <div class="logout-modal-content">
+            <div class="logout-modal-header">
+                <div class="logout-icon">
+                    <i class="fas fa-sign-out-alt"></i>
+                </div>
+                <h3>Confirm Logout</h3>
+                <p>Are you sure you want to logout from your account?</p>
+            </div>
+            <div class="logout-modal-body">
+                <div class="logout-info">
+                    <div class="user-info">
+                        <span class="user-name" id="logoutUserName"></span>
+                        <span class="user-account" id="logoutUserAccount"></span>
+                    </div>
+                    <div class="logout-warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>You will be redirected to the homepage</span>
+                    </div>
+                </div>
+            </div>
+            <div class="logout-modal-footer">
+                <button class="btn-cancel" onclick="closeLogoutModal()">Cancel</button>
+                <button class="btn-logout" onclick="confirmLogout()">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Value Modal -->
+    <div id="chartValueModal" class="modal" style="display:none;">
+        <div class="modal-content" style="max-width:340px;">
+            <div class="modal-header" style="justify-content:center;">
+                <h3 id="chartValueModalTitle" style="font-size:1.1rem;margin:0;">Portfolio Value</h3>
+                <span class="close" onclick="closeChartValueModal()">&times;</span>
+            </div>
+            <div class="modal-body" style="text-align:center;">
+                <div id="chartValueModalLabel" style="color:#64748b;font-size:1rem;margin-bottom:0.5rem;"></div>
+                <div id="chartValueModalValue" style="color:#1e3a8a;font-size:2rem;font-weight:700;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/dashboard.js"></script>
+    <script src="js/gold-prices.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@^2"></script>
+    <script>
+    function closeChartValueModal() {
+        document.getElementById('chartValueModal').style.display = 'none';
+    }
+    </script>
+</body>
+</html> 
