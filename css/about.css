@@ -158,19 +158,7 @@
 }
 
 .timeline-item::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
-    background: #3b82f6;
-    border-radius: 50%;
-    border: 3px solid white;
-    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-    z-index: 3;
-    opacity: 0.8;
+    content: none;
 }
 
 /* Mission & Values Section */
@@ -283,6 +271,14 @@
 .photo-placeholder {
     font-size: 4rem;
     color: #64748b;
+}
+
+.member-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 2px;
 }
 
 .member-info {

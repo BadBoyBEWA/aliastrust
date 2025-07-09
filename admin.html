@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Alias Trust Company</title>
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <a href="index.html">
+                    <h2>Alias Trust Company</h2>
+                </a>
+            </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="admin.html" class="nav-link active">Admin</a></li>
+                <li class="nav-item"><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li class="nav-item"><a href="#" class="nav-link" id="logoutBtn">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard-header" style="margin-top: 80px;">
+        <div class="container">
+            <div class="welcome-section">
+                <h1>Welcome, <span id="adminName">Admin</span></h1>
+                <p>All Registered Users</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="portfolio-details">
+        <div class="container">
+            <div class="section-header" style="flex-direction:column;align-items:flex-start;gap:1rem;">
+                <h2>User Accounts</h2>
+                <div style="display:flex;gap:1rem;flex-wrap:wrap;width:100%;margin-bottom:1rem;">
+                    <input type="text" id="searchInput" placeholder="Search by name, email, or account #" style="padding:0.7em 1em;border-radius:8px;border:1px solid #e5e7eb;min-width:220px;">
+                    <select id="roleFilter" style="padding:0.7em 1em;border-radius:8px;border:1px solid #e5e7eb;">
+                        <option value="">All Roles</option>
+                        <option value="admin">Admin</option>
+                        <option value="client">Client</option>
+                    </select>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table id="usersTable" style="width:100%;border-collapse:collapse;">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Account #</th>
+                            <th>Role</th>
+                            <th>Registered</th>
+                            <th>Last Login</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Filled by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <script>
+    // Only allow admin
+    const session = JSON.parse(localStorage.getItem('aliasTrustSession') || sessionStorage.getItem('aliasTrustSession'));
+    if (!session || session.role !== 'admin') {
+        window.location.href = 'login.html';
+    }
+
+    // Set admin name
+    document.getElementById('adminName').textContent = session.email || 'Admin';
+
+    let users = JSON.parse(localStorage.getItem('aliasTrustUsers')) || [];
+    const tbody = document.querySelector('#usersTable tbody');
+    const searchInput = document.getElementById('searchInput');
+    const roleFilter = document.getElementById('roleFilter');
+
+    function getRoleBadge(role) {
+        if (role === 'admin') return '<span class="role-badge admin">Admin</span>';
+        return '<span class="role-badge client">Client</span>';
+    }
+
+    function renderTable() {
+        let filtered = users.filter(user => {
+            const search = searchInput.value.toLowerCase();
+            const matchesSearch =
+                (user.firstName + ' ' + user.lastName).toLowerCase().includes(search) ||
+                (user.email || '').toLowerCase().includes(search) ||
+                (user.accountNumber || '').toLowerCase().includes(search);
+            const matchesRole = !roleFilter.value || user.role === roleFilter.value;
+            return matchesSearch && matchesRole;
+        });
+        tbody.innerHTML = filtered.map((user, idx) => `
+      <tr>
+        <td>${user.firstName || ''} ${user.lastName || ''}</td>
+        <td>${user.email}</td>
+        <td>${user.accountNumber || ''}</td>
+        <td>${getRoleBadge(user.role)}</td>
+        <td>${user.createdAt ? new Date(user.createdAt).toLocaleString() : ''}</td>
+        <td>${user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never'}</td>
+        <td>
+          <button class="btn btn-danger btn-sm" onclick="deleteUser(${idx})">Delete</button>
+        </td>
+      </tr>
+    `).join('');
+    }
+
+    window.deleteUser = function(idx) {
+        const user = users[idx];
+        if (user.role === 'admin') {
+            alert('Cannot delete admin accounts.');
+            return;
+        }
+        if (confirm(`Are you sure you want to delete user ${user.email}?`)) {
+            users.splice(idx, 1);
+            localStorage.setItem('aliasTrustUsers', JSON.stringify(users));
+            renderTable();
+        }
+    }
+
+    searchInput.addEventListener('input', renderTable);
+    roleFilter.addEventListener('change', renderTable);
+    renderTable();
+
+    // Logout
+    document.getElementById('logoutBtn').onclick = function() {
+        localStorage.removeItem('aliasTrustSession');
+        sessionStorage.removeItem('aliasTrustSession');
+        window.location.href = 'login.html';
+    };
+    </script>
+    <script src="js/main.js"></script>
+</body>
+</html> 

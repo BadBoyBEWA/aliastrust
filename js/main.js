@@ -28,27 +28,34 @@ class MainSystem {
         window.addEventListener('scroll', () => this.updateActiveNavigation());
     }
 
-    // Update active navigation based on scroll position
+    // Update active navigation based on scroll position and URL
     updateActiveNavigation() {
-        const sections = document.querySelectorAll('section[id]');
         const navLinks = document.querySelectorAll('.nav-link');
-        
-        let current = '';
-        sections.forEach(section => {
-            const sectionTop = section.offsetTop - 100;
-            const sectionHeight = section.clientHeight;
-            if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
-                current = section.getAttribute('id');
-            }
-        });
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const currentHash = window.location.hash;
+        let found = false;
 
         navLinks.forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}` || 
-                (current === '' && link.getAttribute('href') === 'index.html')) {
+            const linkHref = link.getAttribute('href');
+            // Match by filename (e.g., dashboard.html) or with anchor (e.g., dashboard.html#portfolio)
+            if (
+                linkHref === currentPath + currentHash ||
+                (currentHash && linkHref === currentHash) ||
+                (!currentHash && linkHref === currentPath)
+            ) {
                 link.classList.add('active');
+                found = true;
             }
         });
+        // If no match and on home, set Home as active
+        if (!found) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === 'index.html') {
+                    link.classList.add('active');
+                }
+            });
+        }
     }
 
     // Initialize animations
@@ -113,6 +120,10 @@ class MainSystem {
             hamburger.addEventListener('click', () => {
                 hamburger.classList.toggle('active');
                 navMenu.classList.toggle('active');
+                // Debug logging
+                console.log('Hamburger clicked!');
+                console.log('navMenu:', navMenu);
+                console.log('navMenu classList:', navMenu.classList.value);
             });
 
             // Close menu when clicking on a link

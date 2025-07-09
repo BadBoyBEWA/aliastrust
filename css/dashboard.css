@@ -266,7 +266,7 @@ body {
 .portfolio-details {
     padding: 4rem 0;
     background: white;
-    margin-bottom: 2rem;
+    margin-bottom: 7rem;
 }
 
 #portfolioChart {
@@ -313,8 +313,18 @@ body {
 }
 
 .chart-container {
-    height: 300px;
-    position: relative;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    min-height: 200px;
+    box-sizing: border-box;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100%;
+    display: block;
 }
 
 .holdings-list {
@@ -376,6 +386,7 @@ body {
     padding: 4rem 0;
     background: #f8fafc;
     margin-bottom: 2rem;
+    margin-top: 17rem;
 }
 
 .trading-section h2 {
@@ -1065,6 +1076,8 @@ body {
         width: 99%;
         max-width: 99vw;
         border-radius: 14px;
+        max-height: 80vh;
+        overflow-y: auto;
     }
     .modal-header, .modal-body {
         padding: 1.2rem;
@@ -1150,4 +1163,241 @@ body {
         gap: 0.75rem;
         align-items: stretch;
     }
+}
+
+@media (max-width: 600px) {
+    .chart-container {
+        min-height: 150px;
+        padding: 0;
+    }
+    .chart-container canvas {
+        min-width: 0;
+        min-height: 120px;
+    }
+}
+
+@media (max-width: 600px) {
+    .trading-form {
+        padding: 1rem;
+        min-width: 0;
+        width: 100%;
+        box-sizing: border-box;
+        max-height: 80vh;
+        overflow-y: auto;
+    }
+    .trading-form .form-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+    .trading-form label {
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+    .trading-form input,
+    .trading-form select {
+        width: 100%;
+        font-size: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 0.5rem;
+        box-sizing: border-box;
+    }
+    .order-summary {
+        font-size: 1rem;
+        padding: 1rem 0;
+    }
+    .btn-full {
+        width: 100%;
+        font-size: 1.1rem;
+        padding: 1rem 0;
+    }
+} 
+
+/* Admin Users Table Styles */
+#usersTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 24px rgba(30, 58, 138, 0.08);
+    margin-bottom: 2rem;
+}
+#usersTable th, #usersTable td {
+    padding: 1rem 1.2rem;
+    text-align: left;
+    font-size: 1rem;
+}
+#usersTable th {
+    background: #f8fafc;
+    color: #1e3a8a;
+    font-weight: 600;
+    border-bottom: 2px solid #e5e7eb;
+}
+#usersTable tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background 0.2s;
+}
+#usersTable tbody tr:nth-child(even) {
+    background: #f3f4f6;
+}
+#usersTable tbody tr:hover {
+    background: #f1f5f9;
+}
+#usersTable td {
+    color: #334155;
+}
+#usersTable td:last-child, #usersTable th:last-child {
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    #usersTable th, #usersTable td {
+        padding: 0.7rem 0.5rem;
+        font-size: 0.95rem;
+    }
+    #usersTable {
+        font-size: 0.95rem;
+    }
+} 
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+    border: none;
+    transition: background 0.2s;
+}
+.btn-danger:hover {
+    background: linear-gradient(135deg, #b91c1c 0%, #dc2626 100%);
+    color: #fff;
+} 
+
+#depositBtn {
+    margin-top: 1.5rem;
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 1rem 0;
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+#depositBtn:hover {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.25);
+} 
+
+/* Deposit Modal Styles */
+#depositModal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
+  background: rgba(30, 41, 59, 0.45);
+  justify-content: center;
+  align-items: center;
+}
+#depositModal .modal-content {
+  background: #fff;
+  margin: 5% auto;
+  border-radius: 16px;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(30, 41, 59, 0.18);
+  padding: 2rem 2rem 1.5rem 2rem;
+  position: relative;
+  animation: fadeIn 0.3s;
+}
+#depositModal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+#depositModal .modal-header h3 {
+  font-size: 1.3rem;
+  color: #1e3a8a;
+  margin: 0;
+}
+#depositModal .close {
+  font-size: 1.5rem;
+  color: #64748b;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+#depositModal .close:hover {
+  color: #dc2626;
+}
+#depositModal .modal-body {
+  margin-bottom: 1rem;
+}
+#depositModal .form-group label {
+  font-weight: 600;
+  color: #1e3a8a;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+#depositModal input[type="number"] {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+  box-sizing: border-box;
+}
+#depositModal input[type="number"]:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+}
+#depositModal .btn-full {
+  width: 100%;
+}
+@media (max-width: 600px) {
+  #depositModal .modal-content {
+    max-width: 95vw;
+    padding: 1rem;
+  }
+} 
+
+.custom-commission-msg {
+  background: #101014;
+  border-left: 6px solid #2563eb; /* blue-600 */
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(5, 5, 5, 0.1), 0 1.5px 6px rgba(30,41,59,0.18);
+  color: #fff;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  font-size: 1.08rem;
+  font-weight: 500;
+  padding: 1.5rem 2rem 1.5rem 2.5rem;
+  margin: 2.5rem 0 1.5rem 0;
+  position: relative;
+  letter-spacing: 0.01em;
+  transition: box-shadow 0.2s;
+}
+.custom-commission-msg::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  border-radius: 14px 0 0 14px;
+  background: #2563eb; /* blue-600 */
+}
+@media (max-width: 600px) {
+  .custom-commission-msg {
+    padding: 1rem 1rem 1rem 1.5rem;
+    font-size: 0.98rem;
+  }
 } 

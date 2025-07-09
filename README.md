@@ -1,6 +1,15 @@
 # aliastrust
 # Alias Trust Company - Gold Investment Platform
 
+## 🚨 Recent Updates
+
+- **Mobile Dashboard Menu:** Hamburger menu now works on all screen sizes, with a modern overlay and debugged interaction.
+- **Premium UI Enhancements:** Classy commission/tax message with blue accent, black background, and improved navigation highlighting.
+- **Navigation Improvements:** Active background for the current page, robust anchor handling, and mobile z-index fixes.
+- **Mobile UX Fixes:** Dropdown hover disabled on mobile, menu always visible on mobile, and debug scripts for troubleshooting.
+
+---
+
 A comprehensive gold investment website with authentication, portfolio management, and trading capabilities. Built with pure HTML, CSS, and vanilla JavaScript.
 
 ## 🌟 Features

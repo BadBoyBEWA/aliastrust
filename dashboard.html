@@ -17,6 +17,11 @@
                     <h2>Alias Trust Company</h2>
                 </a>
             </div>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
             <ul class="nav-menu">
                 <li class="nav-item">
                     <a href="dashboard.html" class="nav-link active">Dashboard</a>
@@ -186,18 +191,18 @@
                     <form id="tradeForm">
                         <div class="form-group">
                             <label for="orderType">Order Type</label>
-                            <select id="orderType" required>
+                            <select id="orderType" name="orderType" required>
                                 <option value="buy">Buy Gold</option>
                                 <option value="sell">Sell Gold</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="orderQuantity">Quantity (oz)</label>
-                            <input type="number" id="orderQuantity" min="0.1" step="0.1" required>
+                            <input type="number" id="orderQuantity" name="orderQuantity" min="0.1" step="0.1" required>
                         </div>
                         <div class="form-group">
                             <label for="orderPrice">Price per oz</label>
-                            <input type="number" id="orderPrice" step="0.01" required>
+                            <input type="number" id="orderPrice" name="orderPrice" step="0.01" required>
                         </div>
                         <div class="order-summary">
                             <div class="summary-row">
@@ -294,7 +299,7 @@
                             <div class="status-icon">📋</div>
                             <div class="status-content">
                                 <h4>Next Inspection</h4>
-                                <p>January 15, 2025</p>
+                                <p>December 15, 2025</p>
                             </div>
                         </div>
                     </div>
@@ -385,14 +390,51 @@
         </div>
     </div>
 
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>Deposit Funds</h3>
+          <span class="close" id="depositClose">&times;</span>
+        </div>
+        <div class="modal-body">
+          <form id="depositForm">
+            <div class="form-group">
+              <label for="depositAmount">Amount (USD)</label>
+              <input type="number" id="depositAmount" name="depositAmount" min="1" step="1" required style="width:100%;padding:0.5rem;">
+            </div>
+            <button type="submit" id="depositSubmit" class="btn btn-primary btn-full" style="margin-top:1.5rem;">Deposit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <script src="js/dashboard.js"></script>
     <script src="js/gold-prices.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@^2"></script>
+    <script src="js/main.js"></script>
     <script>
     function closeChartValueModal() {
         document.getElementById('chartValueModal').style.display = 'none';
     }
     </script>
+    <script>
+// Minimal hamburger debug script
+window.addEventListener('DOMContentLoaded', function() {
+  var hamburger = document.querySelector('.hamburger');
+  var navMenu = document.querySelector('.nav-menu');
+  if (hamburger && navMenu) {
+    hamburger.addEventListener('click', function() {
+      navMenu.classList.toggle('active');
+      hamburger.classList.toggle('active');
+      console.log('[DEBUG] Hamburger clicked!');
+      console.log('[DEBUG] navMenu classList:', navMenu.classList.value);
+    });
+  } else {
+    console.log('[DEBUG] Hamburger or navMenu not found:', {hamburger, navMenu});
+  }
+});
+</script>
 </body>
 </html> 

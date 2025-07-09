@@ -154,7 +154,11 @@ class AuthSystem {
         
         // Redirect to dashboard
         setTimeout(() => {
-            window.location.href = 'dashboard.html';
+            if (user.role === 'admin') {
+                window.location.href = 'admin.html';
+            } else {
+                window.location.href = 'dashboard.html';
+            }
         }, 1500);
     }
 
@@ -204,6 +208,16 @@ class AuthSystem {
 
         this.users.push(newUser);
         this.saveUsers();
+        // Initialize blank portfolio and trading history for new user
+        localStorage.setItem(`portfolio_${newUser.id}`, JSON.stringify({
+            totalValue: 0,
+            goldHoldings: 0,
+            totalReturn: 0,
+            storageFees: 0,
+            holdings: [],
+            performance: []
+        }));
+        localStorage.setItem(`trading_${newUser.id}`, JSON.stringify([]));
 
         this.showMessage('Account created successfully! You can now log in.', 'success');
         
