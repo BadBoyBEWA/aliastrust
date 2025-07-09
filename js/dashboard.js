@@ -108,7 +108,7 @@ class DashboardSystem {
                 msg.style.padding = '1rem 1.5rem';
                 msg.style.borderRadius = '10px';
                 msg.style.boxShadow = '0 2px 8px rgba(251,191,36,0.08)';
-                msg.innerHTML = `Withdrawal commission for your account is 0.5% ($${this.withdrawalCommission.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}) of your total value.<br>\nStorage fees: $12,000<br>\nTaxes incurred on gold holdings: $${this.taxesIncurred.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (1.2%)`;
+                msg.innerHTML = `Withdrawal commission for your account is 0.5% ($${this.withdrawalCommission.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}) of your total value.<br>\nTaxes incurred on gold holdings: $${this.taxesIncurred.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} (1.2%)`;
                 const container = document.querySelector('.portfolio-summary .container');
                 if (container) container.insertBefore(msg, container.firstChild);
             }
