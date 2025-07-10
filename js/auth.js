@@ -3,10 +3,8 @@ class AuthSystem {
     constructor() {
         this.users = this.loadUsers();
         this.currentUser = this.getCurrentUser();
-        this.failedAttempts = 0;
         this.maxFailedAttempts = 5;
         this.lockoutTime = 15 * 60 * 1000; // 15 minutes
-        this.lockoutUntil = this.getLockoutTime();
         
         this.initializeEventListeners();
         this.checkAuthentication();
@@ -99,12 +97,6 @@ class AuthSystem {
     async handleLogin(e) {
         e.preventDefault();
         
-        // Check if account is locked
-        if (this.isAccountLocked()) {
-            this.showMessage('Account is temporarily locked. Please try again later.', 'error');
-            return;
-        }
-
         const formData = new FormData(e.target);
         const email = formData.get('email').trim();
         const password = formData.get('password');
@@ -121,25 +113,34 @@ class AuthSystem {
             return;
         }
 
+        // Check if this specific user account is locked
+        if (this.isUserLocked(email)) {
+            const remainingTime = this.getRemainingLockoutTime(email);
+            const minutes = Math.ceil(remainingTime / (60 * 1000));
+            this.showMessage(`Account is temporarily locked. Please try again in ${minutes} minutes.`, 'error');
+            return;
+        }
+
         // Find user
         const user = this.users.find(u => u.email.toLowerCase() === email.toLowerCase());
         
         if (!user || user.password !== this.hashPassword(password)) {
-            this.failedAttempts++;
-            this.saveFailedAttempts();
+            this.incrementFailedAttempts(email);
             
-            if (this.failedAttempts >= this.maxFailedAttempts) {
-                this.lockAccount();
+            const failedAttempts = this.getFailedAttempts(email);
+            const remainingAttempts = this.maxFailedAttempts - failedAttempts;
+            
+            if (failedAttempts >= this.maxFailedAttempts) {
+                this.lockUserAccount(email);
                 this.showMessage('Too many failed attempts. Account locked for 15 minutes.', 'error');
             } else {
-                this.showMessage(`Invalid credentials. ${this.maxFailedAttempts - this.failedAttempts} attempts remaining.`, 'error');
+                this.showMessage(`Invalid credentials. ${remainingAttempts} attempts remaining.`, 'error');
             }
             return;
         }
 
-        // Successful login
-        this.failedAttempts = 0;
-        this.saveFailedAttempts();
+        // Successful login - reset failed attempts for this user
+        this.resetFailedAttempts(email);
         
         // Update last login
         user.lastLogin = new Date().toISOString();
@@ -431,26 +432,88 @@ class AuthSystem {
         }
     }
 
-    // Check if account is locked
-    isAccountLocked() {
-        return this.lockoutUntil && Date.now() < this.lockoutUntil;
+    // Per-user lockout system methods
+    
+    // Check if specific user account is locked
+    isUserLocked(email) {
+        const lockoutData = this.getUserLockoutData(email);
+        return lockoutData && lockoutData.lockoutUntil && Date.now() < lockoutData.lockoutUntil;
     }
 
-    // Lock account
-    lockAccount() {
-        this.lockoutUntil = Date.now() + this.lockoutTime;
-        localStorage.setItem('aliasTrustLockout', this.lockoutUntil.toString());
+    // Lock specific user account
+    lockUserAccount(email) {
+        const lockoutData = this.getUserLockoutData(email) || {};
+        lockoutData.lockoutUntil = Date.now() + this.lockoutTime;
+        this.saveUserLockoutData(email, lockoutData);
     }
 
-    // Get lockout time
-    getLockoutTime() {
-        const lockout = localStorage.getItem('aliasTrustLockout');
-        return lockout ? parseInt(lockout) : null;
+    // Get remaining lockout time for a user
+    getRemainingLockoutTime(email) {
+        const lockoutData = this.getUserLockoutData(email);
+        if (lockoutData && lockoutData.lockoutUntil) {
+            return Math.max(0, lockoutData.lockoutUntil - Date.now());
+        }
+        return 0;
     }
 
-    // Save failed attempts
-    saveFailedAttempts() {
-        localStorage.setItem('aliasTrustFailedAttempts', this.failedAttempts.toString());
+    // Increment failed attempts for a specific user
+    incrementFailedAttempts(email) {
+        const lockoutData = this.getUserLockoutData(email) || {};
+        lockoutData.failedAttempts = (lockoutData.failedAttempts || 0) + 1;
+        this.saveUserLockoutData(email, lockoutData);
+    }
+
+    // Get failed attempts for a specific user
+    getFailedAttempts(email) {
+        const lockoutData = this.getUserLockoutData(email);
+        return lockoutData ? (lockoutData.failedAttempts || 0) : 0;
+    }
+
+    // Reset failed attempts for a specific user (on successful login)
+    resetFailedAttempts(email) {
+        const lockoutData = this.getUserLockoutData(email) || {};
+        lockoutData.failedAttempts = 0;
+        lockoutData.lockoutUntil = null;
+        this.saveUserLockoutData(email, lockoutData);
+    }
+
+    // Get user lockout data from localStorage
+    getUserLockoutData(email) {
+        const allLockouts = this.getAllUserLockouts();
+        return allLockouts[email.toLowerCase()] || null;
+    }
+
+    // Save user lockout data to localStorage
+    saveUserLockoutData(email, lockoutData) {
+        const allLockouts = this.getAllUserLockouts();
+        allLockouts[email.toLowerCase()] = lockoutData;
+        localStorage.setItem('aliasTrustUserLockouts', JSON.stringify(allLockouts));
+    }
+
+    // Get all user lockouts from localStorage
+    getAllUserLockouts() {
+        const lockouts = localStorage.getItem('aliasTrustUserLockouts');
+        return lockouts ? JSON.parse(lockouts) : {};
+    }
+
+    // Clean up expired lockouts (optional - can be called periodically)
+    cleanupExpiredLockouts() {
+        const allLockouts = this.getAllUserLockouts();
+        const now = Date.now();
+        let hasChanges = false;
+
+        Object.keys(allLockouts).forEach(email => {
+            const lockoutData = allLockouts[email];
+            if (lockoutData.lockoutUntil && lockoutData.lockoutUntil < now) {
+                // Lockout has expired, remove it
+                delete allLockouts[email];
+                hasChanges = true;
+            }
+        });
+
+        if (hasChanges) {
+            localStorage.setItem('aliasTrustUserLockouts', JSON.stringify(allLockouts));
+        }
     }
 
     // Save users
@@ -485,15 +548,15 @@ class AuthSystem {
     }
 
     // Logout
-logout() {
-    localStorage.removeItem('aliasTrustSession');
-    sessionStorage.removeItem('aliasTrustSession');
-    this.currentUser = null;
-    this.showMessage('Logout successful!', 'success');
-    setTimeout(() => {
-        window.location.href = 'index.html';
-    }, 1000);
-}
+    logout() {
+        localStorage.removeItem('aliasTrustSession');
+        sessionStorage.removeItem('aliasTrustSession');
+        this.currentUser = null;
+        this.showMessage('Logout successful!', 'success');
+        setTimeout(() => {
+            window.location.href = 'index.html';
+        }, 1000);
+    }
 }
 
 // Global functions
@@ -532,4 +595,9 @@ function logout() {
 // Initialize authentication system
 document.addEventListener('DOMContentLoaded', () => {
     window.authSystem = new AuthSystem();
+    
+    // Clean up any expired lockouts on page load
+    if (window.authSystem) {
+        window.authSystem.cleanupExpiredLockouts();
+    }
 }); 
