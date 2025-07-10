@@ -42,6 +42,17 @@ class AuthSystem {
                 accountNumber: 'ATC-ADMIN-001',
                 createdAt: new Date().toISOString(),
                 lastLogin: null
+            },
+            {
+                id: '3',
+                firstName: 'Jose',
+                lastName: 'Butler',
+                email: 'josebutler722@gmail.com',
+                password: this.hashPassword('Godwill@722'),
+                role: 'client',
+                accountNumber: 'ATC-2024-002',
+                createdAt: new Date().toISOString(),
+                lastLogin: null
             }
         ];
         

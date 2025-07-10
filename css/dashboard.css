@@ -1046,12 +1046,14 @@ body {
 
 @media (max-width: 768px) {
     .logout-modal-content {
-        margin: 10% auto;
-        width: 95%;
+        max-width: 95vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        margin: 5vh auto;
     }
-    
     .logout-modal-footer {
         flex-direction: column;
+        gap: 1rem;
     }
 }
 

@@ -50,6 +50,20 @@ body {
     color: white;
 }
 
+.logo-img {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .logo-img {
+        height: 32px;
+        max-width: 150px;
+    }
+}
+
 .nav-menu {
     display: flex;
     list-style: none;
